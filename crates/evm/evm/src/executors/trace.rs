@@ -10,8 +10,9 @@ use foundry_config::{Chain, Config, utils::evm_spec_id};
 use foundry_evm_core::{backend::Backend, fork::CreateFork, opts::EvmOpts};
 use foundry_evm_networks::NetworkConfigs;
 use foundry_evm_traces::TraceMode;
-use revm::{primitives::hardfork::SpecId, state::Bytecode};
+use revm::{state::Bytecode};
 use std::ops::{Deref, DerefMut};
+use zksync_revm::{IntoZkSpecId, ZkSpecId};
 
 /// A default executor with tracing enabled
 pub struct TracingExecutor {
@@ -35,7 +36,7 @@ impl TracingExecutor {
             .inspectors(|stack| {
                 stack.trace_mode(trace_mode).networks(networks).create2_deployer(create2_deployer)
             })
-            .spec_id(evm_spec_id(version.unwrap_or_default()))
+            .spec_id(evm_spec_id(version.unwrap_or_default()).into_zk_spec_id())
             .build(env, db);
 
         // Apply the state overrides.
@@ -71,7 +72,7 @@ impl TracingExecutor {
     }
 
     /// Returns the spec id of the executor
-    pub fn spec_id(&self) -> SpecId {
+    pub fn spec_id(&self) -> ZkSpecId {
         self.executor.spec_id()
     }
 
@@ -86,10 +87,10 @@ impl TracingExecutor {
         let env = evm_opts.evm_env().await?;
 
         let fork = evm_opts.get_fork(config, env.clone()).unwrap();
-        let networks = evm_opts.networks.with_chain_id(env.evm_env.cfg_env.chain_id);
+        let networks = evm_opts.networks.with_chain_id(env.evm_env.inner.cfg_env.chain_id);
         config.labels.extend(networks.precompiles_label());
 
-        let chain = env.tx.chain_id.unwrap().into();
+        let chain = env.tx.base.chain_id.unwrap().into();
         Ok((env, fork, chain, networks))
     }
 }
