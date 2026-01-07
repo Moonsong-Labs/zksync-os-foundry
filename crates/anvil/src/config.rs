@@ -37,10 +37,14 @@ use foundry_common::{
 };
 use foundry_config::Config;
 use foundry_evm::{
-    EnvMut, backend::{BlockchainDb, BlockchainDbMeta, SharedBackend}, constants::DEFAULT_CREATE2_DEPLOYER, hardfork::{
+    EnvMut,
+    backend::{BlockchainDb, BlockchainDbMeta, SharedBackend},
+    constants::DEFAULT_CREATE2_DEPLOYER,
+    hardfork::{
         FoundryHardfork, OpHardfork, ethereum_hardfork_from_block_tag,
         spec_id_from_ethereum_hardfork,
-    }, utils::{apply_chain_and_block_specific_env_changes, get_blob_base_fee_update_fraction}
+    },
+    utils::{apply_chain_and_block_specific_env_changes, get_blob_base_fee_update_fraction},
 };
 use itertools::Itertools;
 use op_revm::OpTransaction;

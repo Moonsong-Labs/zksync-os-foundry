@@ -82,7 +82,7 @@ forgetest!(testdata_zksync_revm, |_prj, cmd| {
     drop(dotenv);
 
     let args = vec!["test", "--mc=ZKsyncOSTest", "-vvv"];
-    
+
     let orig_assert = cmd.args(args).assert();
 
     if orig_assert.get_output().status.success() {

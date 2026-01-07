@@ -36,13 +36,13 @@ use revm::{
     primitives::{KECCAK_EMPTY, hardfork::SpecId},
     state::Account,
 };
-use zksync_revm::{ZkSpecId};
 use std::{
     collections::{BTreeMap, HashSet, btree_map::Entry},
     fmt::Display,
     path::Path,
     str::FromStr,
 };
+use zksync_revm::ZkSpecId;
 
 mod record_debug_step;
 use foundry_common::fmt::format_token_raw;

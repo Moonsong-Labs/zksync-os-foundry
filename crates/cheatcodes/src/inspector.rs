@@ -62,7 +62,6 @@ use revm::{
     },
 };
 use serde_json::Value;
-use zksync_revm::{ZKsyncTxError, ZkContext, ZkSpecId};
 use std::{
     cmp::max,
     collections::{BTreeMap, VecDeque},
@@ -72,6 +71,7 @@ use std::{
     path::PathBuf,
     sync::{Arc, OnceLock},
 };
+use zksync_revm::{ZKsyncTxError, ZkContext, ZkSpecId};
 
 mod utils;
 

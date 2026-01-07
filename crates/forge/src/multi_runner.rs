@@ -31,7 +31,6 @@ use foundry_evm::{
 use foundry_evm_networks::NetworkConfigs;
 use foundry_linking::{LinkOutput, Linker};
 use rayon::prelude::*;
-use zksync_revm::ZkSpecId;
 use std::{
     borrow::Borrow,
     collections::BTreeMap,
@@ -39,6 +38,7 @@ use std::{
     sync::{Arc, mpsc},
     time::Instant,
 };
+use zksync_revm::ZkSpecId;
 
 #[derive(Debug, Clone)]
 pub struct TestContract {

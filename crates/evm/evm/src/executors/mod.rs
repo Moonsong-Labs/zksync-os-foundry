@@ -41,7 +41,6 @@ use revm::{
     database::{DatabaseCommit, DatabaseRef},
     interpreter::{InstructionResult, return_ok},
 };
-use zksync_revm::ZkSpecId;
 use std::{
     borrow::Cow,
     sync::{
@@ -50,6 +49,7 @@ use std::{
     },
     time::{Duration, Instant},
 };
+use zksync_revm::ZkSpecId;
 
 mod builder;
 pub use builder::ExecutorBuilder;
