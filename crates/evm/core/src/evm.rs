@@ -53,11 +53,11 @@ pub fn new_evm_with_inspector<'db, I: InspectorExt>(
     ctx.cfg.tx_chain_id_check = true;
     let _spec = ctx.cfg.spec;
 
-    let evm = FoundryEvm { inner: ZKsyncEvm::new(ctx, inspector) };
+    FoundryEvm { inner: ZKsyncEvm::new(ctx, inspector) }
 
     // TODO: we do not need to support injecting dynamic precompiles just yet
     // evm.inspector().get_networks().inject_precompiles(evm.precompiles_mut());
-    evm
+    // evm
 }
 
 pub fn new_evm_with_existing_context<'a>(
@@ -66,19 +66,10 @@ pub fn new_evm_with_existing_context<'a>(
 ) -> FoundryEvm<'a, &'a mut dyn InspectorExt> {
     let _spec = ctx.cfg.spec;
 
-    let evm = FoundryEvm {
-        // inner: RevmEvm::new_with_inspector(
-        inner: ZKsyncEvm::new(
-            ctx,
-            inspector,
-            // EthInstructions::default(),
-            // get_precompiles(spec),
-        ),
-    };
+    FoundryEvm { inner: ZKsyncEvm::new(ctx, inspector) }
 
     // TODO: we do not need to support injecting dynamic precompiles just yet
     // evm.inspector().get_networks().inject_precompiles(evm.precompiles_mut());
-    evm
 }
 
 /// Get the call inputs for the CREATE2 factory.
@@ -247,6 +238,7 @@ impl<I: InspectorExt> DerefMut for FoundryEvm<'_, I> {
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub struct FoundryZKsyncHandler<'db, I: InspectorExt> {
     inner: ZKsyncHandler<
         ZKsyncEvm<
