@@ -172,24 +172,25 @@ impl RunArgs {
 
         let mut evm_version = self.evm_version;
 
-        env.evm_env.cfg_env.disable_block_gas_limit = self.disable_block_gas_limit;
+        env.evm_env.inner.cfg_env.disable_block_gas_limit = self.disable_block_gas_limit;
 
         // By default do not enforce transaction gas limits imposed by Osaka (EIP-7825).
         // Users can opt-in to enable these limits by setting `enable_tx_gas_limit` to true.
         if !self.enable_tx_gas_limit {
-            env.evm_env.cfg_env.tx_gas_limit_cap = Some(u64::MAX);
+            env.evm_env.inner.cfg_env.tx_gas_limit_cap = Some(u64::MAX);
         }
 
-        env.evm_env.cfg_env.limit_contract_code_size = None;
-        env.evm_env.block_env.number = U256::from(tx_block_number);
+        env.evm_env.inner.cfg_env.limit_contract_code_size = None;
+        env.evm_env.inner.block_env.number = U256::from(tx_block_number);
 
         if let Some(block) = &block {
-            env.evm_env.block_env.timestamp = U256::from(block.header.timestamp);
-            env.evm_env.block_env.beneficiary = block.header.beneficiary;
-            env.evm_env.block_env.difficulty = block.header.difficulty;
-            env.evm_env.block_env.prevrandao = Some(block.header.mix_hash.unwrap_or_default());
-            env.evm_env.block_env.basefee = block.header.base_fee_per_gas.unwrap_or_default();
-            env.evm_env.block_env.gas_limit = block.header.gas_limit;
+            env.evm_env.inner.block_env.timestamp = U256::from(block.header.timestamp);
+            env.evm_env.inner.block_env.beneficiary = block.header.beneficiary;
+            env.evm_env.inner.block_env.difficulty = block.header.difficulty;
+            env.evm_env.inner.block_env.prevrandao =
+                Some(block.header.mix_hash.unwrap_or_default());
+            env.evm_env.inner.block_env.basefee = block.header.base_fee_per_gas.unwrap_or_default();
+            env.evm_env.inner.block_env.gas_limit = block.header.gas_limit;
 
             // TODO: we need a smarter way to map the block to the corresponding evm_version for
             // commonly used chains
@@ -224,8 +225,8 @@ impl RunArgs {
             None,
         )?;
         let mut env = Env::new_with_spec_id(
-            env.evm_env.cfg_env.clone(),
-            env.evm_env.block_env.clone(),
+            env.evm_env.inner.cfg_env.clone(),
+            env.evm_env.inner.block_env.clone(),
             env.tx.clone(),
             executor.spec_id(),
         );
@@ -261,7 +262,7 @@ impl RunArgs {
 
                     configure_tx_env(&mut env.as_env_mut(), &tx.inner);
 
-                    env.evm_env.cfg_env.disable_balance_check = true;
+                    env.evm_env.inner.cfg_env.disable_balance_check = true;
 
                     if let Some(to) = Transaction::to(tx) {
                         trace!(tx=?tx.tx_hash(),?to, "executing previous call transaction");
@@ -269,7 +270,7 @@ impl RunArgs {
                             format!(
                                 "Failed to execute transaction: {:?} in block {}",
                                 tx.tx_hash(),
-                                env.evm_env.block_env.number
+                                env.evm_env.inner.block_env.number
                             )
                         })?;
                     } else {
@@ -283,7 +284,7 @@ impl RunArgs {
                                         format!(
                                             "Failed to deploy transaction: {:?} in block {}",
                                             tx.tx_hash(),
-                                            env.evm_env.block_env.number
+                                            env.evm_env.inner.block_env.number
                                         )
                                     });
                                 }
@@ -302,7 +303,7 @@ impl RunArgs {
 
             configure_tx_env(&mut env.as_env_mut(), &tx.inner);
             if is_impersonated_tx(tx.inner.inner.inner()) {
-                env.evm_env.cfg_env.disable_balance_check = true;
+                env.evm_env.inner.cfg_env.disable_balance_check = true;
             }
 
             if let Some(to) = Transaction::to(&tx) {

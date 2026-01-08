@@ -66,6 +66,48 @@ forgetest!(testdata, |_prj, cmd| {
     orig_assert.success();
 });
 
+// Run `forge test` on `/testdata` for zksync-revm.
+forgetest!(testdata_zksync_revm, |_prj, cmd| {
+    let testdata =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../testdata").canonicalize().unwrap();
+    cmd.current_dir(&testdata);
+
+    let mut dotenv = std::fs::File::create(testdata.join(".env")).unwrap();
+    for (name, endpoint) in rpc_endpoints().iter() {
+        if let Some(url) = endpoint.endpoint.as_url() {
+            let key = format!("RPC_{}", name.to_uppercase());
+            writeln!(dotenv, "{key}={url}").unwrap();
+        }
+    }
+    drop(dotenv);
+
+    let args = vec!["test", "--mc=ZKsyncOSTest", "-vvv"];
+
+    let orig_assert = cmd.args(args).assert();
+
+    if orig_assert.get_output().status.success() {
+        return;
+    }
+    let stdout = orig_assert.get_output().stdout_lossy();
+
+    if let Some(i) = stdout.rfind("Suite result:") {
+        test_debug!("--- short stdout ---\n\n{}\n\n---", &stdout[i..]);
+    }
+
+    // Retry failed tests.
+    cmd.args(["--rerun"]);
+    let n = 3;
+    for i in 1..=n {
+        test_debug!("retrying failed tests... ({i}/{n})");
+        let assert = cmd.assert();
+        if assert.get_output().status.success() {
+            return;
+        }
+    }
+
+    orig_assert.success();
+});
+
 // tests that test filters are handled correctly
 forgetest!(can_set_filter_values, |prj, cmd| {
     let patt = regex::Regex::new("test*").unwrap();
@@ -1650,10 +1692,13 @@ Traces:
 });
 
 // https://github.com/foundry-rs/foundry/issues/4370
-forgetest_init!(pause_gas_metering_with_delete, |prj, cmd| {
-    prj.add_test(
-        "ATest.t.sol",
-        r#"
+forgetest_init!(
+    #[ignore = "zksync-revm supports only cancun spec, eip-7702 gas floor unsupported"]
+    pause_gas_metering_with_delete,
+    |prj, cmd| {
+        prj.add_test(
+            "ATest.t.sol",
+            r#"
 import {Test} from "forge-std/Test.sol";
 contract ATest is Test {
     uint a;
@@ -1665,14 +1710,15 @@ contract ATest is Test {
     }
 }
    "#,
-    );
+        );
 
-    cmd.args(["test"]).with_no_redact().assert_success().stdout_eq(str![[r#"
+        cmd.args(["test"]).with_no_redact().assert_success().stdout_eq(str![[r#"
 ...
 [PASS] test_negativeGas() (gas: 96)
 ...
 "#]]);
-});
+    }
+);
 
 // tests `pauseTracing` and `resumeTracing` functions
 #[cfg(not(feature = "isolate-by-default"))]
@@ -1759,14 +1805,17 @@ Traces:
 "#]]);
 });
 
-forgetest_init!(gas_metering_reset, |prj, cmd| {
-    prj.insert_ds_test();
-    prj.insert_vm();
-    prj.clear();
+forgetest_init!(
+    #[ignore = "zksync-revm supports only cancun spec, eip-7702 gas floor unsupported"]
+    gas_metering_reset,
+    |prj, cmd| {
+        prj.insert_ds_test();
+        prj.insert_vm();
+        prj.clear();
 
-    prj.add_source(
-        "ATest.t.sol",
-        r#"
+        prj.add_source(
+            "ATest.t.sol",
+            r#"
 import {Vm} from "./Vm.sol";
 import {DSTest} from "./test.sol";
 contract B {
@@ -1867,9 +1916,9 @@ contract ATest is DSTest {
     }
 }
      "#,
-    );
+        );
 
-    cmd.args(["test"]).with_no_redact().assert_success().stdout_eq(str![[r#"
+        cmd.args(["test"]).with_no_redact().assert_success().stdout_eq(str![[r#"
 ...
 [PASS] testResetGas() (gas: 96)
 [PASS] testResetGas1() (gas: 96)
@@ -1884,7 +1933,8 @@ contract ATest is DSTest {
 [PASS] testResetNegativeGas() (gas: 96)
 ...
 "#]]);
-});
+    }
+);
 
 // https://github.com/foundry-rs/foundry/issues/8705
 forgetest_init!(test_expect_revert_decode, |prj, cmd| {
