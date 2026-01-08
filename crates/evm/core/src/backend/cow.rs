@@ -50,7 +50,7 @@ pub struct CowBackend<'a> {
     pub backend: Cow<'a, Backend>,
     /// Keeps track of whether the backed is already initialized
     is_initialized: bool,
-    /// The [SpecId] of the current backend.
+    /// The [ZkSpecId] of the current backend.
     spec_id: ZkSpecId,
 }
 

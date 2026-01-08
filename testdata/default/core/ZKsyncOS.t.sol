@@ -9,9 +9,8 @@ contract ZKsyncOSTest is Test {
     function testBalanceOf() public {
         vm.deal(address(1337), 10_000);
 
-        (bool success, bytes memory retdata) = address(L2_BASE_TOKEN_ADDRESS).call(
-            abi.encodeWithSignature("balanceOf(address)", address(1337))
-        );
+        (bool success, bytes memory retdata) =
+            address(L2_BASE_TOKEN_ADDRESS).call(abi.encodeWithSignature("balanceOf(address)", address(1337)));
         require(success, "balanceOf call failed");
         uint256 balance = abi.decode(retdata, (uint256));
 

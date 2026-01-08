@@ -5,14 +5,17 @@ use foundry_test_utils::str;
 
 // tests transfer using celo precompile.
 // <https://github.com/foundry-rs/foundry/issues/11622>
-forgetest_init!(celo_transfer, |prj, cmd| {
-    prj.update_config(|config| {
-        config.networks = NetworkConfigs::with_celo();
-    });
+forgetest_init!(
+    #[ignore = "not supporting injecting precompiles yet"]
+    celo_transfer,
+    |prj, cmd| {
+        prj.update_config(|config| {
+            config.networks = NetworkConfigs::with_celo();
+        });
 
-    prj.add_test(
-        "CeloTransfer.t.sol",
-        r#"
+        prj.add_test(
+            "CeloTransfer.t.sol",
+            r#"
 import "forge-std/Test.sol";
 
 interface IERC20 {
@@ -41,9 +44,10 @@ contract CeloTransferTest is Test {
     }
 }
    "#,
-    );
+        );
 
-    cmd.args(["test", "--mt", "testCeloBalance", "-vvv"]).assert_success().stdout_eq(str![[r#"
+        cmd.args(["test", "--mt", "testCeloBalance", "-vvv"]).assert_success().stdout_eq(str![[
+            r#"
 [COMPILING_FILES] with [SOLC_VERSION]
 [SOLC_VERSION] [ELAPSED]
 Compiler run successful!
@@ -58,5 +62,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; [ELAPSED]
 
 Ran 1 test suite [ELAPSED]: 1 tests passed, 0 failed, 0 skipped (1 total tests)
 
-"#]]);
-});
+"#
+        ]]);
+    }
+);

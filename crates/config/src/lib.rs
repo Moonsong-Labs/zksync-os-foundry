@@ -1281,7 +1281,7 @@ impl Config {
         Ok(None)
     }
 
-    /// Returns the [SpecId] derived from the configured [EvmVersion]
+    /// Returns the [ZkSpecId] derived from the configured [EvmVersion]
     pub fn evm_spec_id(&self) -> ZkSpecId {
         evm_spec_id(self.evm_version).into_zk_spec_id()
     }
