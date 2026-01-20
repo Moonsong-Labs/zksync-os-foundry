@@ -6,7 +6,7 @@ use alloy_rpc_types::BlockNumberOrTag;
 use foundry_common::NON_ARCHIVE_NODE_WARNING;
 use foundry_evm_networks::NetworkConfigs;
 use revm::context::{BlockEnv, CfgEnv, TxEnv};
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 /// Initializes a REVM block environment based on a forked
 /// ethereum provider.
@@ -66,7 +66,7 @@ pub async fn environment<N: Network, P: Provider<N>>(
     let cfg = configure_env(chain_id, memory_limit, disable_block_gas_limit, enable_tx_gas_limit);
 
     let mut env = Env {
-        evm_env: zksync_revm::ZKsyncEnv {
+        evm_env: zksync_os_revm::ZKsyncEnv {
             inner: EvmEnv {
                 cfg_env: cfg,
                 block_env: BlockEnv {
@@ -81,7 +81,7 @@ pub async fn environment<N: Network, P: Provider<N>>(
                 },
             },
         },
-        tx: zksync_revm::ZKsyncTx {
+        tx: zksync_os_revm::ZKsyncTx {
             base: TxEnv {
                 caller: origin,
                 gas_price,

@@ -16,7 +16,7 @@ use revm::{
     },
 };
 use std::fmt;
-use zksync_revm::precompiles::l2_base_token::L2_BASE_TOKEN_ADDRESS;
+use zksync_os_revm::precompiles::v2::l2_base_token::L2_BASE_TOKEN_ADDRESS;
 
 const IGNORE: [Address; 3] = [HARDHAT_CONSOLE_ADDRESS, CHEATCODE_ADDRESS, L2_BASE_TOKEN_ADDRESS];
 

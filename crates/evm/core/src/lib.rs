@@ -26,7 +26,7 @@ pub mod abi {
 pub mod env;
 pub use env::*;
 use foundry_evm_networks::NetworkConfigs;
-use zksync_revm::ZkContext;
+use zksync_os_revm::ZkContext;
 
 pub mod backend;
 pub mod buffer;

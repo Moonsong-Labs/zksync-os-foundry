@@ -24,7 +24,7 @@ use revm::{
     state::{Account, AccountInfo},
 };
 use std::{borrow::Cow, collections::BTreeMap};
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 /// A wrapper around `Backend` that ensures only `revm::DatabaseRef` functions are called.
 ///

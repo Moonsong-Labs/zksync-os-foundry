@@ -38,7 +38,7 @@ use std::{
     sync::{Arc, mpsc},
     time::Instant,
 };
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 #[derive(Debug, Clone)]
 pub struct TestContract {

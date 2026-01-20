@@ -71,7 +71,7 @@ use std::{
     path::PathBuf,
     sync::{Arc, OnceLock},
 };
-use zksync_revm::{ZKsyncTxError, ZkContext, ZkSpecId};
+use zksync_os_revm::{ZKsyncTxError, ZkContext, ZkSpecId};
 
 mod utils;
 

@@ -67,7 +67,7 @@ use std::{
 };
 use tokio::sync::RwLock as TokioRwLock;
 use yansi::Paint;
-use zksync_revm::{ToZKsyncCfgEnv, ZKsyncTx};
+use zksync_os_revm::{ToZKsyncCfgEnv, ZKsyncTx};
 
 pub use foundry_common::version::SHORT_VERSION as VERSION_MESSAGE;
 use foundry_evm::{

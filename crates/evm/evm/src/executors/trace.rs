@@ -12,7 +12,7 @@ use foundry_evm_networks::NetworkConfigs;
 use foundry_evm_traces::TraceMode;
 use revm::state::Bytecode;
 use std::ops::{Deref, DerefMut};
-use zksync_revm::{IntoZkSpecId, ZkSpecId};
+use zksync_os_revm::{IntoZkSpecId, ZkSpecId};
 
 /// A default executor with tracing enabled
 pub struct TracingExecutor {

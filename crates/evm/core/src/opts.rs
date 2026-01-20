@@ -185,7 +185,7 @@ impl EvmOpts {
         );
 
         crate::Env {
-            evm_env: zksync_revm::ZKsyncEnv {
+            evm_env: zksync_os_revm::ZKsyncEnv {
                 inner: EvmEnv {
                     cfg_env: cfg,
                     block_env: BlockEnv {
@@ -200,7 +200,7 @@ impl EvmOpts {
                     },
                 },
             },
-            tx: zksync_revm::ZKsyncTx {
+            tx: zksync_os_revm::ZKsyncTx {
                 base: TxEnv {
                     gas_price: self.env.gas_price.unwrap_or_default().into(),
                     gas_limit: self.gas_limit(),

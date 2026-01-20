@@ -112,5 +112,5 @@ allow-git = [
     # Transitive dependency of Tempo
     "https://github.com/paradigmxyz/reth",
     # zksync-revm
-    "https://github.com/nbaztec/zksync-revm",
+    "https://github.com/nbaztec/zksync-os-revm",
 ]

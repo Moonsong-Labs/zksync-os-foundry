@@ -261,6 +261,8 @@ impl TestArgs {
         // Merge all configs.
         let (mut config, evm_opts) = self.load_config_and_evm_opts()?;
 
+        println!("EVM OPTS {:?}", evm_opts.networks);
+
         // Install missing dependencies.
         if install::install_missing_dependencies(&mut config).await && config.auto_detect_remappings
         {

@@ -49,7 +49,7 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use zksync_revm::{IntoZkSpecId, ZkSpecId};
+use zksync_os_revm::{IntoZkSpecId, ZkSpecId};
 
 mod macros;
 

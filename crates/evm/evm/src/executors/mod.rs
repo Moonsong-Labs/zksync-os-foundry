@@ -49,7 +49,7 @@ use std::{
     },
     time::{Duration, Instant},
 };
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 mod builder;
 pub use builder::ExecutorBuilder;
@@ -699,7 +699,7 @@ impl Executor {
     /// the cheatcode state in between calls.
     fn build_test_env(&self, caller: Address, kind: TxKind, data: Bytes, value: U256) -> Env {
         Env {
-            evm_env: zksync_revm::ZKsyncEnv {
+            evm_env: zksync_os_revm::ZKsyncEnv {
                 inner: EvmEnv {
                     cfg_env: {
                         let mut cfg = self.env().evm_env.inner.cfg_env.clone();
@@ -717,7 +717,7 @@ impl Executor {
                     },
                 },
             },
-            tx: zksync_revm::ZKsyncTx {
+            tx: zksync_os_revm::ZKsyncTx {
                 base: TxEnv {
                     caller,
                     kind,

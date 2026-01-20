@@ -2,7 +2,7 @@ use alloy_primitives::Address;
 pub use foundry_fork_db::{DatabaseError, DatabaseResult};
 use revm::context_interface::result::EVMError;
 use std::convert::Infallible;
-use zksync_revm::ZKsyncTxError;
+use zksync_os_revm::ZKsyncTxError;
 
 pub type BackendResult<T> = Result<T, BackendError>;
 

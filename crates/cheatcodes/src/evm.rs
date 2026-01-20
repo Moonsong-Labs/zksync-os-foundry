@@ -42,7 +42,7 @@ use std::{
     path::Path,
     str::FromStr,
 };
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 mod record_debug_step;
 use foundry_common::fmt::format_token_raw;

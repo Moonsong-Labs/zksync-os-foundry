@@ -29,7 +29,7 @@ use revm::{bytecode::Bytecode, database::Database};
 use semver::{BuildMetadata, Version};
 use serde::{Deserialize, Serialize};
 use yansi::Paint;
-use zksync_revm::ZkSpecId;
+use zksync_os_revm::ZkSpecId;
 
 /// Enum to represent the type of bytecode being verified
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, ValueEnum)]

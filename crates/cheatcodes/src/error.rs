@@ -10,7 +10,7 @@ use foundry_wallets::error::WalletSignerError;
 use k256::ecdsa::signature::Error as SignatureError;
 use revm::context_interface::result::EVMError;
 use std::{borrow::Cow, fmt};
-use zksync_revm::ZKsyncTxError;
+use zksync_os_revm::ZKsyncTxError;
 
 /// Cheatcode result type.
 ///

@@ -36,7 +36,7 @@ use std::{
     ops::{Deref, DerefMut},
     sync::Arc,
 };
-use zksync_revm::ZkContext;
+use zksync_os_revm::ZkContext;
 
 #[derive(Clone, Debug, Default)]
 #[must_use = "builders do nothing unless you call `build` on them"]

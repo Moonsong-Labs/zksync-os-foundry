@@ -3,7 +3,7 @@ use revm::{
     Database, Journal, JournalEntry,
     context::{BlockEnv, CfgEnv, JournalInner, JournalTr, TxEnv},
 };
-use zksync_revm::{ZKsyncEnv, ZKsyncTx, ZkContext, ZkSpecId};
+use zksync_os_revm::{ZKsyncEnv, ZKsyncTx, ZkContext, ZkSpecId};
 
 /// Helper container type for [`EvmEnv`] and [`TxEnv`].
 #[derive(Clone, Debug, Default)]
@@ -113,7 +113,7 @@ use revm::{
     context::{BlockEnv, CfgEnv, JournalInner, JournalTr, TxEnv},
     primitives::hardfork::SpecId,
 };
-use zksync_revm::{ZKsyncEnv, ZKsyncTx, ZkContext, ZkSpecId, env::ZkEnvMut};
+use zksync_os_revm::{ZKsyncEnv, ZKsyncTx, ZkContext, ZkSpecId, env::ZkEnvMut};
 
 /// Helper container type for [`EvmEnv`] and [`TxEnv`].
 #[derive(Clone, Debug, Default)]

@@ -57,7 +57,7 @@ mod string;
 
 mod test;
 pub use test::expect::ExpectedCallTracker;
-use zksync_revm::ZkContext;
+use zksync_os_revm::ZkContext;
 
 mod toml;
 

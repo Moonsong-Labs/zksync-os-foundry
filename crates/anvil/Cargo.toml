@@ -70,7 +70,7 @@ revm = { workspace = true, features = [
     "c-kzg",
 ] }
 revm-inspectors.workspace = true
-zksync-revm.workspace = true
+zksync-os-revm.workspace = true
 op-revm.workspace = true
 
 # axum related
