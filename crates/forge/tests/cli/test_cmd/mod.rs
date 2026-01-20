@@ -66,8 +66,8 @@ forgetest!(testdata, |_prj, cmd| {
     orig_assert.success();
 });
 
-// Run `forge test` on `/testdata` for zksync-revm.
-forgetest!(testdata_zksync_revm, |_prj, cmd| {
+// Run `forge test` on `/testdata` for zksync-os-revm.
+forgetest!(testdata_zksync_os_revm, |_prj, cmd| {
     let testdata =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../testdata").canonicalize().unwrap();
     cmd.current_dir(&testdata);
@@ -1693,7 +1693,7 @@ Traces:
 
 // https://github.com/foundry-rs/foundry/issues/4370
 forgetest_init!(
-    #[ignore = "zksync-revm supports only cancun spec, eip-7702 gas floor unsupported"]
+    #[ignore = "zksync-os-revm supports only cancun spec, eip-7702 gas floor unsupported"]
     pause_gas_metering_with_delete,
     |prj, cmd| {
         prj.add_test(
@@ -1806,7 +1806,7 @@ Traces:
 });
 
 forgetest_init!(
-    #[ignore = "zksync-revm supports only cancun spec, eip-7702 gas floor unsupported"]
+    #[ignore = "zksync-os-revm supports only cancun spec, eip-7702 gas floor unsupported"]
     gas_metering_reset,
     |prj, cmd| {
         prj.insert_ds_test();

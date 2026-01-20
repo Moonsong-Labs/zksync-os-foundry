@@ -2702,7 +2702,7 @@ Warning: No transactions to broadcast.
 
 // Tests EIP-7702 broadcast <https://github.com/foundry-rs/foundry/issues/10461>
 forgetest_async!(
-    #[ignore = "zksync-revm supports only cancun spec, eip-7702 unsupported"]
+    #[ignore = "zksync-os-revm supports only cancun spec, eip-7702 unsupported"]
     can_broadcast_txes_with_signed_auth,
     |prj, cmd| {
         foundry_test_utils::util::initialize(prj.root());
@@ -2844,7 +2844,7 @@ ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
 // Tests EIP-7702 with multiple auth <https://github.com/foundry-rs/foundry/issues/10551>
 // Alice sends 5 ETH from Bob to Receiver1 and 1 ETH to Receiver2
 forgetest_async!(
-    #[ignore = "zksync-revm supports only cancun spec, eip-7702 unsupported"]
+    #[ignore = "zksync-os-revm supports only cancun spec, eip-7702 unsupported"]
     can_broadcast_txes_with_multiple_auth,
     |prj, cmd| {
         foundry_test_utils::util::initialize(prj.root());

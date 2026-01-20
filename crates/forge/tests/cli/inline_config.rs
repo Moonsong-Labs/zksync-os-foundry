@@ -329,7 +329,7 @@ Ran 2 test suites [ELAPSED]: 3 tests passed, 0 failed, 0 skipped (3 total tests)
 });
 
 forgetest_init!(
-    #[ignore = "zksync-revm does not have multiple specs, enable when it does"]
+    #[ignore = "zksync-os-revm does not have multiple specs, enable when it does"]
     config_inline_evm_version,
     |prj, cmd| {
         prj.add_test(

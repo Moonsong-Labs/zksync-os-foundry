@@ -3693,7 +3693,7 @@ contract WETH9 {
 // <https://github.com/foundry-rs/foundry/issues/10553>
 // <https://basescan.org/tx/0x17b2de59ebd7dfd2452a3638a16737b6b65ae816c1c5571631dc0d80b63c41de>
 casttest!(
-    #[ignore = "zksync-revm supports only cancun spec"]
+    #[ignore = "zksync-os-revm supports only cancun spec"]
     osaka_can_run_p256_precompile,
     |_prj, cmd| {
         cmd.args([
