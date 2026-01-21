@@ -207,7 +207,7 @@ contract TestEvmVersion is Test {
         EvmVm evm = EvmVm(address(bytes20(uint160(uint256(keccak256("hevm cheat code"))))));
         vm.createSelectFork("<rpc>");
 
-        evm.setEvmVersion("atlasv2");
+        evm.setEvmVersion("AtlasV2");
         evm.getEvmVersion();
     }
 }
@@ -226,7 +226,7 @@ Traces:
   [..] TestEvmVersion::test_evm_version()
     ├─ [0] VM::createSelectFork("<rpc url>")
     │   └─ ← [Return] 0
-    ├─ [0] VM::setEvmVersion("atlasv2")
+    ├─ [0] VM::setEvmVersion("AtlasV2")
     │   └─ ← [Return]
     ├─ [0] VM::getEvmVersion() [staticcall]
     │   └─ ← [Return] "atlasv2"
@@ -257,7 +257,7 @@ EvmVm constant evm = EvmVm(address(bytes20(uint160(uint256(keccak256("hevm cheat
 
 contract TestSetupEvmVersion is Test {
     function setUp() public {
-        evm.setEvmVersion("atlasv2");
+        evm.setEvmVersion("AtlasV2");
     }
 
     function test_evm_version_in_setup() public {
@@ -305,7 +305,7 @@ EvmVm constant evm = EvmVm(address(bytes20(uint160(uint256(keccak256("hevm cheat
 
 contract TestConstructorEvmVersion is Test {
     constructor() {
-        evm.setEvmVersion("atlasv2");
+        evm.setEvmVersion("AtlasV2");
     }
 
     function test_evm_version_in_constructor() public {
