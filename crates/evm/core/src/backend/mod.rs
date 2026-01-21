@@ -21,7 +21,10 @@ use revm::{
     Database, DatabaseCommit, JournalEntry,
     bytecode::Bytecode,
     context::JournalInner,
-    context_interface::{block::BlobExcessGasAndPrice, result::ResultAndState},
+    context_interface::{
+        block::BlobExcessGasAndPrice, journaled_state::account::JournaledAccountTr,
+        result::ResultAndState,
+    },
     database::{CacheDB, DatabaseRef},
     inspector::NoOpInspector,
     precompile::{PrecompileSpecId, Precompiles},
@@ -1429,11 +1432,11 @@ impl DatabaseExt for Backend {
         if let Some(bytecode) = source.code.as_ref() {
             let bytecode_hash = keccak256(bytecode);
             let bytecode = Bytecode::new_raw(bytecode.0.clone().into());
-            state_acc.set_code(bytecode_hash, bytecode);
+            state_acc.data.set_code(bytecode_hash, bytecode);
         }
 
         // Set the account's balance.
-        state_acc.set_balance(source.balance);
+        state_acc.data.set_balance(source.balance);
 
         // Set the account's storage, if the `storage` field is present.
         if let Some(acc) = journaled_state.state.get_mut(target) {

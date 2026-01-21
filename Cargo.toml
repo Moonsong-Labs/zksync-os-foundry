@@ -234,7 +234,7 @@ foundry-compilers = { version = "0.19.10", default-features = false, features = 
     "rustls",
     "svm-solc",
 ] }
-foundry-fork-db = "0.21"
+foundry-fork-db = "0.22"
 solang-parser = { version = "=0.3.9", package = "foundry-solang-parser" }
 solar = { package = "solar-compiler", version = "=0.1.8", default-features = false }
 svm = { package = "svm-rs", version = "0.5", default-features = false, features = [
@@ -294,16 +294,16 @@ op-alloy-rpc-types = "0.23.1"
 op-alloy-flz = "0.13.1"
 
 ## alloy-evm
-alloy-evm = "0.25.2"
-alloy-op-evm = "0.25.2"
+alloy-evm = "0.26.3"
+alloy-op-evm = "0.26.3"
 
 # revm
-revm = { version = "33.1.0", default-features = false }
-revm-inspectors = { version = "0.33.2", features = ["serde"] }
-op-revm = { version = "14.1.0", default-features = false }
+revm = { version = "34.0.0", default-features = false }
+revm-inspectors = { version = "0.34.0", features = ["serde"] }
+op-revm = { version = "15.0.0", default-features = false }
 
 # zksync
-zksync-os-revm = { git = "https://github.com/nbaztec/zksync-os-revm", branch = "revm-33.1.0" }
+zksync-os-revm = { path = "../zksync-os-revm" }
 
 ## cli
 anstream = "0.6"

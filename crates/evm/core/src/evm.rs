@@ -78,16 +78,16 @@ fn get_create2_factory_call_inputs(
     inputs: &CreateInputs,
     deployer: Address,
 ) -> CallInputs {
-    let calldata = [&salt.to_be_bytes::<32>()[..], &inputs.init_code[..]].concat();
+    let calldata = [&salt.to_be_bytes::<32>()[..], &inputs.init_code()[..]].concat();
     CallInputs {
-        caller: inputs.caller,
+        caller: inputs.caller(),
         bytecode_address: deployer,
         known_bytecode: None,
         target_address: deployer,
         scheme: CallScheme::Call,
-        value: CallValue::Transfer(inputs.value),
+        value: CallValue::Transfer(inputs.value()),
         input: CallInput::Bytes(calldata.into()),
-        gas_limit: inputs.gas_limit,
+        gas_limit: inputs.gas_limit(),
         is_static: false,
         return_memory_offset: 0..0,
     }
@@ -336,7 +336,7 @@ impl<'db, I: InspectorExt> Handler for FoundryZKsyncHandler<'db, I> {
 
     fn validate_initial_tx_gas(
         &self,
-        evm: &Self::Evm,
+        evm: &mut Self::Evm,
     ) -> Result<revm::interpreter::InitialAndFloorGas, Self::Error> {
         self.inner.validate_initial_tx_gas(evm)
     }
@@ -440,12 +440,12 @@ impl<'db, I: InspectorExt> FoundryZKsyncHandler<'db, I> {
         init: &mut FrameInit,
     ) -> Result<Option<FrameResult>, <Self as Handler>::Error> {
         if let FrameInput::Create(inputs) = &init.frame_input
-            && let CreateScheme::Create2 { salt } = inputs.scheme
+            && let CreateScheme::Create2 { salt } = inputs.scheme()
         {
             let (ctx, inspector) = evm.ctx_inspector();
 
             if inspector.should_use_create2_factory(ctx, inputs) {
-                let gas_limit = inputs.gas_limit;
+                let gas_limit = inputs.gas_limit();
 
                 // Get CREATE2 deployer.
                 let create2_deployer = evm.inspector().create2_deployer();
@@ -603,12 +603,12 @@ impl<'db, I: InspectorExt> FoundryHandler<'db, I> {
         init: &mut FrameInit,
     ) -> Result<Option<FrameResult>, <Self as Handler>::Error> {
         if let FrameInput::Create(inputs) = &init.frame_input
-            && let CreateScheme::Create2 { salt } = inputs.scheme
+            && let CreateScheme::Create2 { salt } = inputs.scheme()
         {
             let (ctx, inspector) = evm.ctx_inspector();
 
             if inspector.should_use_create2_factory(ctx, inputs) {
-                let gas_limit = inputs.gas_limit;
+                let gas_limit = inputs.gas_limit();
 
                 // Get CREATE2 deployer.
                 let create2_deployer = evm.inspector().create2_deployer();
