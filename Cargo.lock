@@ -12179,6 +12179,7 @@ dependencies = [
 [[package]]
 name = "zksync-os-revm"
 version = "0.1.0"
+source = "git+https://github.com/nbaztec/zksync-os-revm?branch=revm-34.0.0#2bf24e351d5a1fb348b8d2239748208022097844"
 dependencies = [
  "alloy-evm",
  "alloy-primitives",

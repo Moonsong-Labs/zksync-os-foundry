@@ -382,7 +382,13 @@ fn deploy_code(
         .map_or(ccx.caller, |prank| prank.new_caller);
 
     let outcome = executor.exec_create(
-        CreateInputs::new(caller, scheme, value.unwrap_or(U256::ZERO), bytecode.into(), ccx.gas_limit),
+        CreateInputs::new(
+            caller,
+            scheme,
+            value.unwrap_or(U256::ZERO),
+            bytecode.into(),
+            ccx.gas_limit,
+        ),
         ccx,
     )?;
 

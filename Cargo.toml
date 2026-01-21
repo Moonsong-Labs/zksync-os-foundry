@@ -303,7 +303,7 @@ revm-inspectors = { version = "0.34.0", features = ["serde"] }
 op-revm = { version = "15.0.0", default-features = false }
 
 # zksync
-zksync-os-revm = { path = "../zksync-os-revm" }
+zksync-os-revm = { git = "https://github.com/nbaztec/zksync-os-revm", branch = "revm-34.0.0" }
 
 ## cli
 anstream = "0.6"

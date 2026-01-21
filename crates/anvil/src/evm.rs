@@ -138,23 +138,22 @@ mod tests {
             chain.operator_fee_scalar = Some(U256::from(0));
         }
 
-        let op_cfg = op_env.evm_env.cfg_env.clone().with_spec(op_spec);
+        let op_cfg = CfgEnv::<OpSpecId>::new_with_spec(op_spec);
         let op_evm_context = OpContext {
             journaled_state: {
                 let mut journal = Journal::new(EmptyDB::default());
-                // Converting SpecId into OpSpecId
-                journal.set_spec_id(op_env.evm_env.cfg_env.spec);
+                journal.set_spec_id(op_spec.into());
                 journal
             },
             block: op_env.evm_env.block_env.clone(),
-            cfg: op_cfg.clone(),
+            cfg: op_cfg,
             tx: op_env.tx.clone(),
             chain,
             local: LocalContext::default(),
             error: Ok(()),
         };
 
-        let op_precompiles = OpPrecompiles::new_with_spec(op_cfg.spec).precompiles();
+        let op_precompiles = OpPrecompiles::new_with_spec(op_spec).precompiles();
         let op_evm = EitherEvm::Op(OpEvm::new(
             op_revm::OpEvm(RevmEvm::new_with_inspector(
                 op_evm_context,

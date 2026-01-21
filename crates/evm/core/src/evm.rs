@@ -199,9 +199,6 @@ impl<'db, I: InspectorExt> Evm for FoundryEvm<'db, I> {
         let mut handler = FoundryZKsyncHandler::default();
         let result = handler.inspect_run(&mut self.inner)?;
 
-        let result: ExecutionResult<HaltReason> =
-            result.map_haltreason(|reason| reason.try_into().unwrap());
-
         Ok(ResultAndState::new(result, self.inner.0.ctx.journaled_state.inner.state.clone()))
     }
 
