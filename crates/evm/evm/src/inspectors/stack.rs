@@ -1065,7 +1065,7 @@ impl Inspector<ZkContext<&mut dyn DatabaseExt>> for InspectorStackRefMut<'_> {
             |inspector| inspector.create(ecx, create).map(Some),
         );
 
-        if !matches!(create.scheme, CreateScheme::Create2 { .. })
+        if !matches!(create.scheme(), CreateScheme::Create2 { .. })
             && self.enable_isolation
             && !self.in_inner_context
             && ecx.journaled_state.depth == 1
@@ -1073,10 +1073,10 @@ impl Inspector<ZkContext<&mut dyn DatabaseExt>> for InspectorStackRefMut<'_> {
             let (result, address) = self.transact_inner(
                 ecx,
                 TxKind::Create,
-                create.caller,
-                create.init_code.clone(),
-                create.gas_limit,
-                create.value,
+                create.caller(),
+                create.init_code().clone(),
+                create.gas_limit(),
+                create.value(),
             );
             return Some(CreateOutcome { result, address });
         }

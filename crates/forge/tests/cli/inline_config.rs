@@ -409,7 +409,7 @@ forgetest_init!(config_inline_evm_version_zksync, |prj, cmd| {
         contract FunctionConfig is Test {
             /// forge-config: default.evm_version = "shanghai"
             function test_new() public {
-                assertEq("atlas", vm.getEvmVersion());
+                assertEq("atlasv2", vm.getEvmVersion());
             }
         }
 
@@ -417,7 +417,7 @@ forgetest_init!(config_inline_evm_version_zksync, |prj, cmd| {
         contract ContractConfig is Test {
             /// forge-config: default.evm_version = "cancun"
             function test_new() public {
-                assertEq("atlas", vm.getEvmVersion());
+                assertEq("atlasv2", vm.getEvmVersion());
             }
         }
     "#,
