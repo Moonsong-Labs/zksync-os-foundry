@@ -21,7 +21,7 @@ mod tests {
     };
     use alloy_op_evm::OpEvm;
     use alloy_primitives::{Address, Bytes, TxKind, U256, address};
-    use foundry_evm::core::either_evm::EitherEvm;
+    use foundry_evm::core::either_evm::{EitherEvm, EitherTx};
     use foundry_evm_networks::NetworkConfigs;
     use itertools::Itertools;
     use op_revm::{L1BlockInfo, OpContext, OpSpecId, OpTransaction, precompiles::OpPrecompiles};
@@ -121,14 +121,14 @@ mod tests {
     ) {
         let op_env = crate::eth::backend::env::Env {
             evm_env: EvmEnv { block_env: Default::default(), cfg_env: CfgEnv::new_with_spec(spec) },
-            tx: OpTransaction::<TxEnv> {
+            tx: foundry_evm::core::either_evm::EitherTx::Op(OpTransaction::<TxEnv> {
                 base: TxEnv {
                     kind: TxKind::Call(PRECOMPILE_ADDR),
                     data: PAYLOAD.into(),
                     ..Default::default()
                 },
                 ..Default::default()
-            },
+            }),
             networks: NetworkConfigs::with_optimism(),
         };
 
@@ -140,6 +140,10 @@ mod tests {
         }
 
         let op_cfg: CfgEnv<OpSpecId> = CfgEnv::new_with_spec(op_spec);
+        let op_tx = match &op_env.tx {
+            EitherTx::Op(op_transaction) => op_transaction.clone(),
+            _ => panic!("must be op tx"),
+        };
         let op_evm_context = OpContext {
             journaled_state: {
                 let mut journal = Journal::new(EmptyDB::default());
@@ -149,7 +153,7 @@ mod tests {
             },
             block: op_env.evm_env.block_env.clone(),
             cfg: op_cfg.clone(),
-            tx: op_env.tx.clone(),
+            tx: op_tx,
             chain,
             local: LocalContext::default(),
             error: Ok(()),
@@ -260,8 +264,13 @@ mod tests {
 
         assert!(evm.precompiles().addresses().contains(&PRECOMPILE_ADDR));
 
+        let op_tx = match &env.tx {
+            EitherTx::Op(op_transaction) => op_transaction.clone(),
+            _ => panic!("must be op tx"),
+        };
+
         let result = match &mut evm {
-            EitherEvm::Op(op_evm) => op_evm.transact(env.tx).unwrap(),
+            EitherEvm::Op(op_evm) => op_evm.transact(op_tx).unwrap(),
             _ => unreachable!(),
         };
 
@@ -285,8 +294,12 @@ mod tests {
 
         assert!(evm.precompiles().addresses().contains(&PRECOMPILE_ADDR));
 
+        let op_tx = match &env.tx {
+            EitherTx::Op(op_transaction) => op_transaction.clone(),
+            _ => panic!("must be op tx"),
+        };
         let result = match &mut evm {
-            EitherEvm::Op(op_evm) => op_evm.transact(env.tx).unwrap(),
+            EitherEvm::Op(op_evm) => op_evm.transact(op_tx).unwrap(),
             _ => unreachable!(),
         };
 

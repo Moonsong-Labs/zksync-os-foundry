@@ -34,6 +34,10 @@ pub struct NetworkConfigs {
     #[arg(skip)]
     #[serde(default)]
     bypass_prevrandao: bool,
+
+    #[arg(help_heading = "Networks", long, conflicts_with_all = ["celo", "optimism"])]
+    #[serde(default)]
+    zksync_os: bool,
 }
 
 impl NetworkConfigs {
@@ -47,6 +51,10 @@ impl NetworkConfigs {
 
     pub fn is_optimism(&self) -> bool {
         self.optimism
+    }
+
+    pub fn is_zksync_os(&self) -> bool {
+        self.zksync_os
     }
 
     /// Returns the base fee parameters for the configured network.

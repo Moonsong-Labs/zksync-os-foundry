@@ -5,7 +5,7 @@ use crate::{
             cheats::{CheatEcrecover, CheatsManager},
             db::Db,
             env::Env,
-            mem::op_haltreason_to_instruction_result,
+            mem::either_haltreason_to_instruction_result,
             validate::TransactionValidator,
         },
         error::InvalidTransactionError,
@@ -29,13 +29,17 @@ use alloy_evm::{
 };
 use alloy_op_evm::OpEvmFactory;
 use alloy_primitives::{B256, Bloom, BloomInput, Log};
+use alloy_zksync_os_evm::ZKsyncEvmFactory;
 use anvil_core::eth::{
     block::{BlockInfo, create_block},
     transaction::{PendingTransaction, TransactionInfo},
 };
 use foundry_evm::{
     backend::DatabaseError,
-    core::{either_evm::EitherEvm, precompiles::EC_RECOVER},
+    core::{
+        either_evm::{EitherEvm, EitherTx},
+        precompiles::EC_RECOVER,
+    },
     traces::{CallTraceDecoder, CallTraceNode},
 };
 use foundry_evm_networks::NetworkConfigs;
@@ -49,6 +53,7 @@ use revm::{
     primitives::hardfork::SpecId,
 };
 use std::{fmt::Debug, sync::Arc};
+use zksync_os_revm::ZkContext;
 
 /// Represents an executed transaction (transacted on the DB)
 #[derive(Debug)]
@@ -308,7 +313,7 @@ impl<DB: Db + ?Sized, V: TransactionValidator> TransactionExecutor<'_, DB, V> {
             tx_env.enveloped_tx = Some(alloy_rlp::encode(tx.transaction.as_ref()).into());
         }
 
-        Env::new(self.evm_env.clone(), tx_env, self.networks)
+        Env::new(self.evm_env.clone(), EitherTx::Op(tx_env), self.networks)
     }
 }
 
@@ -342,7 +347,13 @@ impl<DB: Db + ?Sized, V: TransactionValidator> Iterator for &mut TransactionExec
         let env = self.env_for(&transaction.pending_transaction);
 
         // check that we comply with the block's gas limit, if not disabled
-        let max_block_gas = self.gas_used.saturating_add(env.tx.base.gas_limit);
+        let base = match &env.tx {
+            EitherTx::Eth(tx_env) => &tx_env,
+            EitherTx::Op(op_transaction) => &op_transaction.base,
+            EitherTx::ZKsync(zksync_tx) => &zksync_tx.base,
+        };
+
+        let max_block_gas = self.gas_used.saturating_add(base.gas_limit);
         if !env.evm_env.cfg_env.disable_block_gas_limit
             && max_block_gas > env.evm_env.block_env.gas_limit
         {
@@ -447,7 +458,7 @@ impl<DB: Db + ?Sized, V: TransactionValidator> Iterator for &mut TransactionExec
                 (InstructionResult::Revert, gas_used, Some(Output::Call(output)), None)
             }
             ExecutionResult::Halt { reason, gas_used } => {
-                (op_haltreason_to_instruction_result(reason), gas_used, None, None)
+                (either_haltreason_to_instruction_result(reason), gas_used, None, None)
             }
         };
 
@@ -500,9 +511,22 @@ pub fn new_evm_with_inspector<DB, I>(
 ) -> EitherEvm<DB, I, PrecompilesMap>
 where
     DB: Database<Error = DatabaseError> + Debug,
-    I: Inspector<EthEvmContext<DB>> + Inspector<OpContext<DB>>,
+    I: Inspector<EthEvmContext<DB>> + Inspector<OpContext<DB>> + Inspector<ZkContext<DB>>,
 {
-    if env.networks.is_optimism() {
+    if env.networks.is_zksync_os() {
+        let zksync_evm_env = EvmEnv::new(
+            env.evm_env
+                .cfg_env
+                .clone()
+                .with_spec_and_mainnet_gas_params(zksync_os_revm::ZkSpecId::AtlasV2),
+            env.evm_env.block_env.clone(),
+        );
+        EitherEvm::ZKsync(ZKsyncEvmFactory::default().create_evm_with_inspector(
+            db,
+            zksync_evm_env,
+            inspector,
+        ))
+    } else if env.networks.is_optimism() {
         let evm_env = EvmEnv::new(
             env.evm_env
                 .cfg_env

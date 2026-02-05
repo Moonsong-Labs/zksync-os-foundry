@@ -12,7 +12,7 @@ use anvil_rpc::{
     error::{ErrorCode, RpcError},
     response::ResponseResult,
 };
-use foundry_evm::{backend::DatabaseError, decode::RevertDecoder};
+use foundry_evm::{backend::DatabaseError, core::either_evm::EitherTxError, decode::RevertDecoder};
 use op_revm::OpTransactionError;
 use revm::{
     context_interface::result::{EVMError, InvalidHeader, InvalidTransaction},
@@ -20,6 +20,7 @@ use revm::{
 };
 use serde::Serialize;
 use tokio::time::Duration;
+use zksync_os_revm::ZKsyncTxError;
 
 pub(crate) type Result<T> = std::result::Result<T, BlockchainError>;
 
@@ -169,6 +170,40 @@ where
                     Self::DepositTransactionUnsupported
                 }
                 OpTransactionError::MissingEnvelopedTx => Self::InvalidTransaction(err.into()),
+            },
+            EVMError::Header(err) => match err {
+                InvalidHeader::ExcessBlobGasNotSet => Self::ExcessBlobGasNotSet,
+                InvalidHeader::PrevrandaoNotSet => Self::PrevrandaoNotSet,
+            },
+            EVMError::Database(err) => err.into(),
+            EVMError::Custom(err) => Self::Message(err),
+        }
+    }
+}
+
+impl<T> From<EVMError<T, EitherTxError>> for BlockchainError
+where
+    T: Into<Self>,
+{
+    fn from(err: EVMError<T, EitherTxError>) -> Self {
+        match err {
+            EVMError::Transaction(err) => match err {
+                EitherTxError::Eth(eth_tx_err) => InvalidTransactionError::from(eth_tx_err).into(),
+                EitherTxError::Op(op_tx_err) => match op_tx_err {
+                    OpTransactionError::Base(err) => InvalidTransactionError::from(err).into(),
+                    OpTransactionError::DepositSystemTxPostRegolith => {
+                        Self::DepositTransactionUnsupported
+                    }
+                    OpTransactionError::HaltedDepositPostRegolith => {
+                        Self::DepositTransactionUnsupported
+                    }
+                    OpTransactionError::MissingEnvelopedTx => {
+                        Self::InvalidTransaction(op_tx_err.into())
+                    }
+                },
+                EitherTxError::ZKsync(zksync_tx_error) => match zksync_tx_error {
+                    ZKsyncTxError::Base(err) => InvalidTransactionError::from(err).into(),
+                },
             },
             EVMError::Header(err) => match err {
                 InvalidHeader::ExcessBlobGasNotSet => Self::ExcessBlobGasNotSet,
@@ -395,6 +430,25 @@ impl From<OpTransactionError> for InvalidTransactionError {
         }
     }
 }
+
+impl From<ZKsyncTxError> for InvalidTransactionError {
+    fn from(value: ZKsyncTxError) -> Self {
+        match value {
+            ZKsyncTxError::Base(err) => err.into(),
+        }
+    }
+}
+
+impl From<EitherTxError> for InvalidTransactionError {
+    fn from(value: EitherTxError) -> Self {
+        match value {
+            EitherTxError::Eth(invalid_transaction) => invalid_transaction.into(),
+            EitherTxError::Op(op_transaction_error) => op_transaction_error.into(),
+            EitherTxError::ZKsync(zksync_tx_error) => zksync_tx_error.into(),
+        }
+    }
+}
+
 /// Helper trait to easily convert results to rpc results
 pub(crate) trait ToRpcResponseResult {
     fn to_rpc_result(self) -> ResponseResult;

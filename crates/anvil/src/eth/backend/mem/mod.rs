@@ -88,7 +88,10 @@ use flate2::{Compression, read::GzDecoder, write::GzEncoder};
 use foundry_evm::{
     backend::{DatabaseError, DatabaseResult, RevertStateSnapshotAction},
     constants::DEFAULT_CREATE2_DEPLOYER_RUNTIME_CODE,
-    core::{either_evm::EitherEvm, precompiles::EC_RECOVER},
+    core::{
+        either_evm::{EitherEvm, EitherHaltReason, EitherTx},
+        precompiles::EC_RECOVER,
+    },
     decode::RevertDecoder,
     inspectors::AccessListInspector,
     traces::{
@@ -129,6 +132,7 @@ use std::{
 };
 use storage::{Blockchain, DEFAULT_HISTORY_LIMIT, MinedTransaction};
 use tokio::sync::RwLock as AsyncRwLock;
+use zksync_os_revm::ZkContext;
 
 pub mod cache;
 pub mod fork_db;
@@ -1128,7 +1132,8 @@ impl Backend {
     where
         DB: DatabaseRef + ?Sized,
         I: Inspector<EthEvmContext<WrapDatabaseRef<&'db DB>>>
-            + Inspector<OpContext<WrapDatabaseRef<&'db DB>>>,
+            + Inspector<OpContext<WrapDatabaseRef<&'db DB>>>
+            + Inspector<ZkContext<WrapDatabaseRef<&'db DB>>>,
         WrapDatabaseRef<&'db DB>: Database<Error = DatabaseError>,
     {
         let mut evm = new_evm_with_inspector(WrapDatabaseRef(db), env, inspector);
@@ -1167,8 +1172,13 @@ impl Backend {
         );
 
         if env.networks.is_optimism() {
-            env.tx.enveloped_tx =
-                Some(alloy_rlp::encode(tx.pending_transaction.transaction.as_ref()).into());
+            match &mut env.tx {
+                EitherTx::Op(op_transaction) => {
+                    op_transaction.enveloped_tx =
+                        Some(alloy_rlp::encode(tx.pending_transaction.transaction.as_ref()).into())
+                }
+                _ => panic!("must be optimism tx"),
+            }
         }
 
         let db = self.db.read().await;
@@ -1183,7 +1193,7 @@ impl Backend {
                 (InstructionResult::Revert, gas_used, Some(Output::Call(output)), None)
             }
             ExecutionResult::Halt { reason, gas_used } => {
-                let eth_reason = op_haltreason_to_instruction_result(reason);
+                let eth_reason = either_haltreason_to_instruction_result(reason);
                 (eth_reason, gas_used, None, None)
             }
         };
@@ -1562,10 +1572,13 @@ impl Backend {
             ..Default::default()
         };
         base.set_signed_authorization(authorization_list.unwrap_or_default());
-        env.tx = OpTransaction { base, ..Default::default() };
+        env.tx = EitherTx::Op(OpTransaction { base, ..Default::default() });
 
         if let Some(nonce) = nonce {
-            env.tx.base.nonce = nonce;
+            match &mut env.tx {
+                EitherTx::Op(op_transaction) => op_transaction.base.nonce = nonce,
+                _ => panic!("must be op transaction"),
+            }
         }
 
         if env.evm_env.block_env.basefee == 0 {
@@ -1576,7 +1589,10 @@ impl Backend {
 
         // Deposit transaction?
         if let Ok(deposit) = get_deposit_tx_parts(&other) {
-            env.tx.deposit = deposit;
+            match &mut env.tx {
+                EitherTx::Op(op_transaction) => op_transaction.deposit = deposit,
+                _ => panic!("must be op transaction"),
+            }
         }
 
         env
@@ -1834,7 +1850,7 @@ impl Backend {
                 (InstructionResult::Revert, gas_used, Some(Output::Call(output)))
             }
             ExecutionResult::Halt { reason, gas_used } => {
-                (op_haltreason_to_instruction_result(reason), gas_used, None)
+                (either_haltreason_to_instruction_result(reason), gas_used, None)
             }
         };
         drop(evm);
@@ -1975,7 +1991,7 @@ impl Backend {
                     (InstructionResult::Revert, gas_used, Some(Output::Call(output)))
                 }
                 ExecutionResult::Halt { reason, gas_used } => {
-                    (op_haltreason_to_instruction_result(reason), gas_used, None)
+                    (either_haltreason_to_instruction_result(reason), gas_used, None)
                 }
             };
 
@@ -2016,7 +2032,7 @@ impl Backend {
                 (InstructionResult::Revert, gas_used, Some(Output::Call(output)))
             }
             ExecutionResult::Halt { reason, gas_used } => {
-                (op_haltreason_to_instruction_result(reason), gas_used, None)
+                (either_haltreason_to_instruction_result(reason), gas_used, None)
             }
         };
         drop(evm);
@@ -2644,9 +2660,10 @@ impl Backend {
     where
         for<'a> I: Inspector<EthEvmContext<WrapDatabaseRef<&'a CacheDB<Box<&'a StateDb>>>>>
             + Inspector<OpContext<WrapDatabaseRef<&'a CacheDB<Box<&'a StateDb>>>>>
+            + Inspector<ZkContext<WrapDatabaseRef<&'a CacheDB<Box<&'a StateDb>>>>>
             + 'a,
         for<'a> F:
-            FnOnce(ResultAndState<OpHaltReason>, CacheDB<Box<&'a StateDb>>, I, TxEnv, Env) -> T,
+            FnOnce(ResultAndState<EitherHaltReason>, CacheDB<Box<&'a StateDb>>, I, TxEnv, Env) -> T,
     {
         let block = {
             let storage = self.blockchain.storage.read();
@@ -2730,7 +2747,7 @@ impl Backend {
             let mut evm = self.new_evm_with_inspector_ref(&cache_db, &env, &mut inspector);
 
             let result = evm
-                .transact(tx_env.clone())
+                .transact(EitherTx::Op(tx_env.clone()))
                 .map_err(|err| BlockchainError::Message(err.to_string()))?;
 
             Ok(f(result, cache_db, inspector, tx_env.base, env))
@@ -3828,6 +3845,19 @@ pub fn op_haltreason_to_instruction_result(op_reason: OpHaltReason) -> Instructi
     match op_reason {
         OpHaltReason::Base(eth_h) => eth_h.into(),
         OpHaltReason::FailedDeposit => InstructionResult::Stop,
+    }
+}
+
+pub fn either_haltreason_to_instruction_result(
+    either_reason: EitherHaltReason,
+) -> InstructionResult {
+    match either_reason {
+        EitherHaltReason::Eth(eth_halt_reason) => eth_halt_reason.into(),
+        EitherHaltReason::Op(op_halt_reason) => match op_halt_reason {
+            OpHaltReason::Base(eth_h) => eth_h.into(),
+            OpHaltReason::FailedDeposit => InstructionResult::Stop,
+        },
+        EitherHaltReason::ZKsync(zksync_halt_reason) => zksync_halt_reason.into(),
     }
 }
 

@@ -266,8 +266,7 @@ dependencies = [
 [[package]]
 name = "alloy-evm"
 version = "0.26.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a96827207397445a919a8adc49289b53cc74e48e460411740bba31cec2fc307d"
+source = "git+https://github.com/nbaztec/evm?branch=zksync-os-revm-0.26.3#a1019d74deeed100a8702aedc4c9f54e4cfe932c"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -283,6 +282,7 @@ dependencies = [
  "op-revm",
  "revm",
  "thiserror 2.0.18",
+ "zksync-os-revm",
 ]
 
 [[package]]
@@ -382,8 +382,7 @@ dependencies = [
 [[package]]
 name = "alloy-op-evm"
 version = "0.26.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54dc5c46a92fc7267055a174d30efb34e2599a0047102a4d38a025ae521435ba"
+source = "git+https://github.com/nbaztec/evm?branch=zksync-os-revm-0.26.3#a1019d74deeed100a8702aedc4c9f54e4cfe932c"
 dependencies = [
  "alloy-consensus",
  "alloy-eips",
@@ -1004,6 +1003,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloy-zksync-os-evm"
+version = "0.26.3"
+source = "git+https://github.com/nbaztec/evm?branch=zksync-os-revm-0.26.3#a1019d74deeed100a8702aedc4c9f54e4cfe932c"
+dependencies = [
+ "alloy-evm",
+ "alloy-primitives",
+ "revm",
+ "zksync-os-revm",
+]
+
+[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1132,6 +1142,7 @@ dependencies = [
  "alloy-sol-types",
  "alloy-transport",
  "alloy-trie",
+ "alloy-zksync-os-evm",
  "anvil-core",
  "anvil-rpc",
  "anvil-server",
@@ -1173,6 +1184,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber 0.3.22",
  "yansi",
+ "zksync-os-revm",
 ]
 
 [[package]]
@@ -4868,6 +4880,7 @@ dependencies = [
  "alloy-provider",
  "alloy-rpc-types",
  "alloy-sol-types",
+ "alloy-zksync-os-evm",
  "auto_impl",
  "eyre",
  "foundry-cheatcodes-spec",
@@ -4876,6 +4889,7 @@ dependencies = [
  "foundry-evm-abi",
  "foundry-evm-networks",
  "foundry-fork-db",
+ "foundry-primitives",
  "foundry-test-utils",
  "futures",
  "itertools 0.14.0",
@@ -4889,6 +4903,7 @@ dependencies = [
  "tokio",
  "tracing",
  "url",
+ "zksync-os-revm",
 ]
 
 [[package]]
@@ -5043,6 +5058,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tempo-primitives",
+ "zksync-os-revm",
 ]
 
 [[package]]
@@ -12051,6 +12067,18 @@ dependencies = [
  "log",
  "thiserror 2.0.18",
  "zip",
+]
+
+[[package]]
+name = "zksync-os-revm"
+version = "0.1.0"
+source = "git+https://github.com/nbaztec/zksync-os-revm?branch=revm-34.0.0-alloy-zksync-os-evm#a68d93680124dd6ae7f0bc53f51e30ff1adb6dae"
+dependencies = [
+ "alloy-sol-types",
+ "auto_impl",
+ "revm",
+ "serde",
+ "tracing",
 ]
 
 [[package]]

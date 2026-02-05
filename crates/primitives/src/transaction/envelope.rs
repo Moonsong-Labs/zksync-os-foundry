@@ -17,6 +17,7 @@ use op_alloy_consensus::{DEPOSIT_TX_TYPE_ID, OpTransaction as OpTransactionTrait
 use op_revm::OpTransaction;
 use revm::context::TxEnv;
 use tempo_primitives::{AASigned, TempoTransaction};
+use zksync_os_revm::ZKsyncTx;
 
 //
 /// Container type for signed, typed transactions.
@@ -215,6 +216,15 @@ impl FromRecoveredTx<FoundryTxEnvelope> for OpTransaction<TxEnv> {
                 Self::from_recovered_tx(sealed_tx.inner(), caller)
             }
             FoundryTxEnvelope::Tempo(_) => panic!("unsupported tx type on optimism"),
+        }
+    }
+}
+
+impl FromRecoveredTx<FoundryTxEnvelope> for ZKsyncTx<TxEnv> {
+    fn from_recovered_tx(tx: &FoundryTxEnvelope, _caller: Address) -> Self {
+        // NOTE(zk): implement in future
+        match tx {
+            _ => panic!("unsupported on zksync"),
         }
     }
 }

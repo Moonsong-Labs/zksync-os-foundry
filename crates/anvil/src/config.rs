@@ -39,7 +39,7 @@ use foundry_config::Config;
 use foundry_evm::{
     backend::{BlockchainDb, BlockchainDbMeta, SharedBackend},
     constants::DEFAULT_CREATE2_DEPLOYER,
-    core::AsEnvMut,
+    core::{AsEnvMut, either_evm::EitherTx},
     hardfork::{
         FoundryHardfork, OpHardfork, ethereum_hardfork_from_block_tag,
         spec_id_from_ethereum_hardfork,
@@ -1091,10 +1091,10 @@ impl NodeConfig {
                     ..Default::default()
                 },
             ),
-            OpTransaction {
+            EitherTx::Op(OpTransaction {
                 base: TxEnv { chain_id: Some(self.get_chain_id()), ..Default::default() },
                 ..Default::default()
-            },
+            }),
             self.networks,
         );
 
@@ -1368,7 +1368,12 @@ latest block number: {latest_block}"
             // need to update the dev signers and env with the chain id
             self.set_chain_id(Some(chain_id));
             env.evm_env.cfg_env.chain_id = chain_id;
-            env.tx.base.chain_id = chain_id.into();
+            let tx_chain_id = match &mut env.tx {
+                EitherTx::Eth(tx_env) => &mut tx_env.chain_id,
+                EitherTx::Op(op_transaction) => &mut op_transaction.base.chain_id,
+                EitherTx::ZKsync(zksync_tx) => &mut zksync_tx.base.chain_id,
+            };
+            *tx_chain_id = chain_id.into();
             chain_id
         };
         let override_chain_id = self.chain_id;

@@ -16,6 +16,7 @@ workspace = true
 [dependencies]
 foundry-cheatcodes-spec.workspace = true
 foundry-common.workspace = true
+foundry-primitives.workspace = true
 foundry-config.workspace = true
 foundry-evm-abi.workspace = true
 foundry-evm-networks.workspace = true
@@ -54,6 +55,8 @@ revm = { workspace = true, features = [
 revm-inspectors.workspace = true
 op-revm.workspace = true
 alloy-op-evm.workspace = true
+alloy-zksync-os-evm.workspace = true
+zksync-os-revm.workspace = true
 
 auto_impl.workspace = true
 eyre.workspace = true

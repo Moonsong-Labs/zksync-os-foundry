@@ -338,13 +338,15 @@ op-alloy-rpc-types = "0.23.1"
 op-alloy-flz = "0.13.1"
 
 ## alloy-evm
-alloy-evm = "0.26.3"
-alloy-op-evm = "0.26.3"
+alloy-evm =  { git = "https://github.com/nbaztec/evm", branch = "zksync-os-revm-0.26.3"  }
+alloy-op-evm =  { git = "https://github.com/nbaztec/evm", branch = "zksync-os-revm-0.26.3"  }
+alloy-zksync-os-evm = { git = "https://github.com/nbaztec/evm", branch = "zksync-os-revm-0.26.3"  }
 
 # revm
 revm = { version = "34.0.0", default-features = false }
 revm-inspectors = { version = "0.34.0", features = ["serde"] }
 op-revm = { version = "15.0.0", default-features = false }
+zksync-os-revm = { git = "https://github.com/nbaztec/zksync-os-revm", branch = "revm-34.0.0-alloy-zksync-os-evm" }
 
 ## cli
 anstream = "0.6"
@@ -496,6 +498,8 @@ rexpect = { git = "https://github.com/rust-cli/rexpect", rev = "2ed0b1898d7edaf6
 ## alloy-evm
 # alloy-evm = { git = "https://github.com/alloy-rs/evm.git", branch = "staging-revm" }
 # alloy-op-evm = { git = "https://github.com/alloy-rs/evm.git", branch = "staging-revm" }
+# alloy-evm = { path = "../nbaztec-evm/crates/evm" }
+# alloy-op-evm = { path = "../nbaztec-evm/crates/op-evm" }
 
 ## revm
 # revm = { git = "https://github.com/bluealloy/revm.git", rev = "7e59936" }
